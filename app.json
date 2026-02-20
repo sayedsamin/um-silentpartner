@@ -43,6 +43,14 @@
           "microphonePermission": "Listen to conversation for social coaching."
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       "@react-native-firebase/app",
       [
         "@embrace-io/react-native/lib/app.plugin.js",
