@@ -38,6 +38,12 @@
     "plugins": [
       "expo-audio",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow camera access to scan event QR codes."
+        }
+      ],
+      [
         "@siteed/expo-audio-studio",
         {
           "microphonePermission": "Listen to conversation for social coaching."

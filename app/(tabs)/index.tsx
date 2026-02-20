@@ -1,10 +1,10 @@
-import { DashboardScreen } from '../../src/features/dashboard';
+import { ProfessionalIdentityScreen } from '../../src/features/onboarding';
 import { RequireAuth } from '../../src/features/navigation';
 
-export default function DashboardRoute() {
+export default function ProfessionalIdentityRoute() {
   return (
     <RequireAuth>
-      <DashboardScreen />
+      <ProfessionalIdentityScreen />
     </RequireAuth>
   );
 }
