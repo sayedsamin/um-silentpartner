@@ -1,10 +1,5 @@
-import { ConversationStyleScreen } from '../../src/features/onboarding';
-import { RequireAuth } from '../../src/features/navigation';
+import { Redirect } from 'expo-router';
 
 export default function ConversationStyleRoute() {
-  return (
-    <RequireAuth>
-      <ConversationStyleScreen />
-    </RequireAuth>
-  );
+  return <Redirect href="/onboarding-questions" />;
 }

@@ -292,7 +292,7 @@ export const ProfessionalIdentityScreen = () => {
             <Text style={styles.profileLabel}>
               Positions: {linkedInProfile.positionCount} | Education: {linkedInProfile.educationCount}
             </Text>
-            <TouchableOpacity style={styles.continueButton} onPress={() => router.push('/primary-goal')}>
+            <TouchableOpacity style={styles.continueButton} onPress={() => router.push('/onboarding-questions')}>
               <Text style={styles.continueText}>Continue</Text>
             </TouchableOpacity>
           </View>
