@@ -35,6 +35,14 @@ export const useAiListeningEngine = () => {
   const [hashtags, setHashtags] = useState<string[]>([]);
   const sessionRef = useRef<AiRealtimeSessionHandle | null>(null);
 
+  const appendEvent = useCallback((type: AiClientEvent['type'], message: string) => {
+    setEvents((prev) => [makeEvent(type, message), ...prev].slice(0, 24));
+  }, []);
+
+  const markStep = useCallback((step: EngineStepId) => {
+    setCompletedSteps((prev) => ({ ...prev, [step]: true }));
+  }, []);
+
   const clearContextState = useCallback(() => {
     setCompletedSteps({});
     setEvents([]);
@@ -43,6 +51,16 @@ export const useAiListeningEngine = () => {
     setNudgeText('');
     setNudgeLoading(false);
     setHashtags([]);
+  }, []);
+
+  const clearRunState = useCallback(() => {
+    setError(null);
+    setCompletedSteps({ stop: false });
+    setLiveTranscript('');
+    setNudgeText('');
+    setNudgeLoading(false);
+    setHashtags([]);
+    setEvents([makeEvent('system', 'Starting AI listening engine...')]);
   }, []);
 
   const appendTranscript = useCallback((nextText: string) => {
@@ -58,30 +76,24 @@ export const useAiListeningEngine = () => {
       return;
     }
 
-    setError(null);
     setConnectionState('connecting');
-    setCompletedSteps({ stop: false });
-    setLiveTranscript('');
-    setNudgeText('');
-    setNudgeLoading(false);
-    setHashtags([]);
-    setEvents([makeEvent('system', 'Starting AI listening engine...')]);
+    clearRunState();
 
     try {
       sessionRef.current = await startAiRealtimeSession({
         onConnected: () => {
-          setCompletedSteps((prev) => ({ ...prev, connect: true }));
+          markStep('connect');
           setConnectionState('connected');
         },
         onStreaming: () => {
-          setCompletedSteps((prev) => ({ ...prev, stream: true }));
+          markStep('stream');
           setConnectionState('streaming');
         },
         onSpeechObserved: () => {
-          setCompletedSteps((prev) => ({ ...prev, observe: true }));
+          markStep('observe');
         },
         onTextDelta: (delta) => {
-          setCompletedSteps((prev) => ({ ...prev, event: true }));
+          markStep('event');
           setNudgeLoading(false);
           setNudgeText((prev) => `${prev}${delta}`);
         },
@@ -89,7 +101,7 @@ export const useAiListeningEngine = () => {
           appendTranscript(heardText);
         },
         onConversationItem: (text) => {
-          setCompletedSteps((prev) => ({ ...prev, event: true }));
+          markStep('event');
           setNudgeLoading(false);
           setNudgeText((prev) => {
             if (!text) return prev;
@@ -97,17 +109,17 @@ export const useAiListeningEngine = () => {
           });
         },
         onClientEvent: (type, message) => {
-          setEvents((prev) => [makeEvent(type, message), ...prev].slice(0, 24));
+          appendEvent(type, message);
         },
         onStopped: () => {
-          setCompletedSteps((prev) => ({ ...prev, stop: true }));
+          markStep('stop');
           setConnectionState('stopped');
         },
         onError: (sessionError) => {
           setConnectionState('error');
           setError(sessionError.message);
           setNudgeLoading(false);
-          setEvents((prev) => [makeEvent('error', sessionError.message), ...prev].slice(0, 24));
+          appendEvent('error', sessionError.message);
         },
       });
     } catch (startError) {
@@ -115,9 +127,9 @@ export const useAiListeningEngine = () => {
       setConnectionState('error');
       setError(message);
       setNudgeLoading(false);
-      setEvents((prev) => [makeEvent('error', message), ...prev]);
+      appendEvent('error', message);
     }
-  }, [appendTranscript, connectionState]);
+  }, [appendEvent, appendTranscript, clearRunState, connectionState, markStep]);
 
   const stop = useCallback(() => {
     if (connectionState === 'idle' || connectionState === 'stopped') {
@@ -128,12 +140,12 @@ export const useAiListeningEngine = () => {
     void (async () => {
       await sessionRef.current?.stop();
       sessionRef.current = null;
-      setCompletedSteps((prev) => ({ ...prev, stop: true }));
+      markStep('stop');
       setNudgeLoading(false);
-      setEvents((prev) => [makeEvent('system', 'WebRTC peer connection closed.'), ...prev]);
+      appendEvent('system', 'WebRTC peer connection closed.');
       setConnectionState('stopped');
     })();
-  }, [connectionState]);
+  }, [appendEvent, connectionState, markStep]);
 
   const nudge = useCallback(() => {
     setNudgeText('');
