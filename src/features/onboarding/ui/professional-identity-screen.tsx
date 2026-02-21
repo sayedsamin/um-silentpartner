@@ -90,6 +90,22 @@ export const ProfessionalIdentityScreen = () => {
     },
     connectInner: { flexDirection: 'row', alignItems: 'center' },
     connectText: { color: theme.colors.white, fontWeight: '700', fontSize: 16 },
+    listeningButton: {
+      width: '90%',
+      backgroundColor: theme.colors.white,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.borderColor,
+    },
+    listeningText: {
+      color: theme.colors.darkGray,
+      fontWeight: '700',
+      fontSize: 16,
+    },
     privacy: {
       color: '#9A9A9A',
       marginTop: 12,
@@ -126,6 +142,12 @@ export const ProfessionalIdentityScreen = () => {
             <Ionicons name="logo-linkedin" size={20} color={theme.colors.white} />
             <Text style={styles.connectText}>  Connect LinkedIn</Text>
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.listeningButton}
+          onPress={() => router.push('/ai-listening-engine')}
+        >
+          <Text style={styles.listeningText}>AI listening engine</Text>
         </TouchableOpacity>
 
         <Text style={styles.privacy}>Your data is encrypted and never sold.</Text>

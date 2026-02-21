@@ -67,7 +67,8 @@
         }
       ],
       "@react-native-firebase/auth",
-      "expo-secure-store"
+      "expo-secure-store",
+      "@config-plugins/react-native-webrtc"
     ]
   }
 }
